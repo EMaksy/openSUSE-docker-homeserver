@@ -1,23 +1,27 @@
-version: '3'
+version: "3"
 
 volumes:
   nextcloud:
     driver: local
   db:
 
+networks:
+  nc-nginx:
+
 services:
   db:
-    image: mariadb
+    image: mariadb:10.5
     restart: always
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-    command: --innodb-read-only-compressed=OFF
     volumes:
       - db:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=test
-      - MYSQL_PASSWORD=test
+      - MYSQL_ROOT_PASSWORD=<INSERT-YOUR-PASSWORD>
+      - MYSQL_PASSWORD=<INSERT-YOUR-PASSWORD>
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
+    networks:
+      nc-nginx:
 
   app:
     image: nextcloud
@@ -29,7 +33,9 @@ services:
     volumes:
       - nextcloud:/var/www/html
     environment:
-      - MYSQL_PASSWORD=test
+      - MYSQL_PASSWORD=<INSERT-YOUR-PASSWORD>
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
       - MYSQL_HOST=db
+    networks:
+      nc-nginx:
