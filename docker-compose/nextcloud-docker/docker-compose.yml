@@ -17,8 +17,6 @@ services:
       - MYSQL_PASSWORD=<INSERT-ANOTHER-PASSWORD-THEN-THE-DATABASE-ROOT-PASSWORD-FOR-BETTER-SECURITY>
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
-    networks:
-      nc-nginx:
 
   app:
     image: nextcloud:latest
