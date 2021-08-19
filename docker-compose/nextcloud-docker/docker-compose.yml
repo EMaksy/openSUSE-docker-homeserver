@@ -1,30 +1,27 @@
 version: "3"
-
+  
 volumes:
   nextcloud:
     driver: local
   db:
 
-networks:
-  nc-nginx:
-
 services:
   db:
-    image: mariadb:10.5
+    image: mariadb:latest
     restart: always
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    command: --transaction-isolation=READ-COMMITTED --log-bin=ROW --innodb-read-only-compressed=OFF
     volumes:
       - db:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=<INSERT-YOUR-PASSWORD>
-      - MYSQL_PASSWORD=<INSERT-YOUR-PASSWORD>
+      - MYSQL_ROOT_PASSWORD=<INSERT-A-DATABASE-ROOT-PASSWORD>
+      - MYSQL_PASSWORD=<INSERT-ANOTHER-PASSWORD-THEN-THE-DATABASE-ROOT-PASSWORD-FOR-BETTER-SECURITY>
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
     networks:
       nc-nginx:
 
   app:
-    image: nextcloud
+    image: nextcloud:latest
     restart: always
     ports:
       - 8080:80
@@ -33,11 +30,8 @@ services:
     volumes:
       - nextcloud:/var/www/html
     environment:
-      - MYSQL_PASSWORD=<INSERT-YOUR-PASSWORD>
+      - MYSQL_PASSWORD=<INSERT-ANOTHER-PASSWORD-THEN-THE-DATABASE-ROOT-PASSWORD-FOR-BETTER-SECURITY>
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
       - MYSQL_HOST=db
-      - NEXTCLOUD_ADMIN_USER=<ADD-ADMIN-USER-NAME>
-      - NEXTCLOUD_ADMIN_PASSWORD=<ADD-ADMIN-USER-PASSWORD>
-    networks:
-      nc-nginx:
+
