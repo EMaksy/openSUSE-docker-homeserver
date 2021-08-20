@@ -1,0 +1,733 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>How to have control over your personal data in 3 steps with Nextcloud, openSUSE and Docker</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	text-indent: -1.7em;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+}
+.highlight-gray {
+	color: rgb(155,154,151);
+}
+.highlight-brown {
+	color: rgb(100,71,58);
+}
+.highlight-orange {
+	color: rgb(217,115,13);
+}
+.highlight-yellow {
+	color: rgb(223,171,1);
+}
+.highlight-teal {
+	color: rgb(15,123,108);
+}
+.highlight-blue {
+	color: rgb(11,110,153);
+}
+.highlight-purple {
+	color: rgb(105,64,165);
+}
+.highlight-pink {
+	color: rgb(173,26,114);
+}
+.highlight-red {
+	color: rgb(224,62,62);
+}
+.highlight-gray_background {
+	background: rgb(235,236,237);
+}
+.highlight-brown_background {
+	background: rgb(233,229,227);
+}
+.highlight-orange_background {
+	background: rgb(250,235,221);
+}
+.highlight-yellow_background {
+	background: rgb(251,243,219);
+}
+.highlight-teal_background {
+	background: rgb(221,237,234);
+}
+.highlight-blue_background {
+	background: rgb(221,235,241);
+}
+.highlight-purple_background {
+	background: rgb(234,228,242);
+}
+.highlight-pink_background {
+	background: rgb(244,223,235);
+}
+.highlight-red_background {
+	background: rgb(251,228,228);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(55, 53, 47, 0.6);
+	fill: rgba(55, 53, 47, 0.6);
+}
+.block-color-brown {
+	color: rgb(100,71,58);
+	fill: rgb(100,71,58);
+}
+.block-color-orange {
+	color: rgb(217,115,13);
+	fill: rgb(217,115,13);
+}
+.block-color-yellow {
+	color: rgb(223,171,1);
+	fill: rgb(223,171,1);
+}
+.block-color-teal {
+	color: rgb(15,123,108);
+	fill: rgb(15,123,108);
+}
+.block-color-blue {
+	color: rgb(11,110,153);
+	fill: rgb(11,110,153);
+}
+.block-color-purple {
+	color: rgb(105,64,165);
+	fill: rgb(105,64,165);
+}
+.block-color-pink {
+	color: rgb(173,26,114);
+	fill: rgb(173,26,114);
+}
+.block-color-red {
+	color: rgb(224,62,62);
+	fill: rgb(224,62,62);
+}
+.block-color-gray_background {
+	background: rgb(235,236,237);
+}
+.block-color-brown_background {
+	background: rgb(233,229,227);
+}
+.block-color-orange_background {
+	background: rgb(250,235,221);
+}
+.block-color-yellow_background {
+	background: rgb(251,243,219);
+}
+.block-color-teal_background {
+	background: rgb(221,237,234);
+}
+.block-color-blue_background {
+	background: rgb(221,235,241);
+}
+.block-color-purple_background {
+	background: rgb(234,228,242);
+}
+.block-color-pink_background {
+	background: rgb(244,223,235);
+}
+.block-color-red_background {
+	background: rgb(251,228,228);
+}
+.select-value-color-default { background-color: rgba(206,205,202,0.5); }
+.select-value-color-gray { background-color: rgba(155,154,151, 0.4); }
+.select-value-color-brown { background-color: rgba(140,46,0,0.2); }
+.select-value-color-orange { background-color: rgba(245,93,0,0.2); }
+.select-value-color-yellow { background-color: rgba(233,168,0,0.2); }
+.select-value-color-green { background-color: rgba(0,135,107,0.2); }
+.select-value-color-blue { background-color: rgba(0,120,223,0.2); }
+.select-value-color-purple { background-color: rgba(103,36,222,0.2); }
+.select-value-color-pink { background-color: rgba(221,0,129,0.2); }
+.select-value-color-red { background-color: rgba(255,0,26,0.2); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="6c5cdcc1-c520-4d11-9f3f-c4dc65915a01" class="page sans"><header><h1 class="page-title">How to have control over your personal data in 3 steps with Nextcloud, openSUSE and Docker</h1></header><div class="page-body"><p id="adef18b5-2ffd-4b96-956f-71364e680b86" class="">
+</p><h2 id="fa45e53e-fd32-4dd6-8518-a27a9f3aad21" class="">Do you want to</h2><ul id="4264def0-9860-4b74-aa1e-a24a812286f9" class="bulleted-list"><li>Regain controls and own your personal Data?</li></ul><ul id="abefc0cb-39dd-48df-a2f3-f8c366959d7b" class="bulleted-list"><li>Share Images/Videos and Data inside your Home network?</li></ul><ul id="bc17bf8b-6b15-4a4f-b72b-54816d288064" class="bulleted-list"><li>Have access to your data on the home network even if the internet cloud is down? </li></ul><ul id="f3a4577b-91ef-49ed-8923-d89be9e2b07a" class="bulleted-list"><li>Access your data from the Internet?</li></ul><ul id="142b8c23-a48e-45e1-a371-428551b8ac0b" class="bulleted-list"><li>Share your data with other people via the Internet? </li></ul><ul id="12364f26-338b-4dfd-a7d3-474833e2954d" class="bulleted-list"><li>Scale storage on Demand?</li></ul><ul id="90dfb248-f2cc-4fc3-b1d2-f9e6eaa320f5" class="bulleted-list"><li>Make use out of Open Source Projects without additional costs?</li></ul><ul id="48301bb1-7dd5-49ac-a27e-76da4d72a5cf" class="bulleted-list"><li>Have a great learning experience? </li></ul><p id="ed75e2d1-65ea-4f23-95b7-94a2570823a1" class="">
+</p><p id="0f74d60d-e430-4635-8de7-03a43a54d47b" class="">If your answer is &quot;yes&quot; to one of this question, then you are in the perfect place</p><h3 id="a4bcb805-50bd-4dd3-8b81-43abd0a42c1a" class="">For who is this article? </h3><p id="df4990ee-50d5-49e1-aa04-cfa278a6455c" class="">This &quot;How to&quot; guide is targeted to:</p><ul id="a1be6060-91b4-4e83-bc13-ccd61748283a" class="bulleted-list"><li> All tech enthusiast out there.</li></ul><ul id="cb318e9a-1488-4466-a275-2444b1375b0f" class="bulleted-list"><li> All advanced Linux Users/Admins and Developers,  so a short command summary will be provided, so you can skip to the juicy part <a href="How%20to%20have%20control%20over%20your%20personal%20data%20in%203%20s%206c5cdcc1c5204d119f3fc4dc65915a01/Quick%20Guide%20for%20advanced%20user%2095f9b309907c4357b21ceaab948f6165.html">here</a></li></ul><h3 id="26d22ffe-3f94-4303-8445-9eb3dd9715e9" class="">Goal of this Article</h3><p id="8cb1285e-2ba9-4a24-9e4e-435b423d4a16" class="">I will provide all the needed Information, step by step,  to create your own personal Cloud and make it accessible from the Internet.</p><ul id="a120c5ca-06b2-4b36-847b-2a74a7d7603e" class="toggle"><li><details open=""><summary>Use already owned hardware to host your own server.</summary></details></li></ul><ul id="25b24eec-8345-411e-876c-ca7a8d1c944a" class="toggle"><li><details open=""><summary>Learn more about openSUSE Linux.</summary></details></li></ul><ul id="3e3a8740-5fbb-48a6-be2f-ddc64d68f2ee" class="toggle"><li><details open=""><summary>Install and learn to use docker container technologies to power your private server.</summary></details></li></ul><ul id="9b3e07ea-956a-46b2-972b-2e5707785e54" class="toggle"><li><details open=""><summary>Host your own private cloud storage and be in the power of your own data with Nextcloud.</summary></details></li></ul><ul id="a2d430f8-d3ef-42cd-931d-e1aef5c04e88" class="toggle"><li><details open=""><summary>Use Nginx proxy manager to redirect end encrypt your data that is sent to your cloud.</summary></details></li></ul><ul id="106da063-3c3b-4e92-be12-1a6c613cc591" class="toggle"><li><details open=""><summary>Get a free dynamic domain to access your cloud  with Duck DNS </summary></details></li></ul><h3 id="b7ce000c-d18a-4a3f-ba2a-dddd2944ccf0" class="">Used technologies </h3><ul id="94e0f361-610e-42c3-8a4c-98d775ace77e" class="bulleted-list"><li><a href="https://get.opensuse.org/leap/#download">SUSE LEAP 15.3</a></li></ul><ul id="19cd83c6-165c-497a-a948-8d546666f69b" class="bulleted-list"><li><a href="https://docs.docker.com/get-started/overview/">Docker and Docker-Compose</a></li></ul><ul id="293915ec-e10d-4534-b663-27b8c21b761e" class="bulleted-list"><li><a href="https://nextcloud.com/">Nextcloud</a></li></ul><ul id="23ca659d-4357-4a49-9f5f-c2c686af0465" class="bulleted-list"><li><a href="https://nginxproxymanager.com/guide/#quick-setup">Nginx Proxy Manager</a></li></ul><ul id="f667e07d-36e3-48c1-9b45-1d0e25f47781" class="bulleted-list"><li><a href="https://www.duckdns.org/">Duck DNS</a></li></ul><p id="2af2d5a5-e997-458c-bc5e-90a5d182c417" class="">
+</p><p id="007b7b24-32f9-442d-bc03-9c07ff0b538f" class="">This list is for you to have a quick overview about all the things we will use.</p><p id="64e31bd1-d6b2-40aa-941c-ab997d004bd1" class="">It is not required to read everything about the projects to proceed.</p><p id="718437e2-29c5-45ac-9487-8e0d43e3b66b" class="">Feel free to check out the projects, if you are interested to learn more about the perfect Configuration for your use case.</p><h2 id="763a3d2b-28ac-41a1-ae4c-676ac90a3a09" class="">Hardware Requirements </h2><p id="6f8ec610-7f29-47d7-a52b-33248a07b67d" class="">There are a good deal of different Hardware system options, how to achieve the best performance.</p><p id="0488d369-1917-43a9-8e56-74118d0b573b" class="">So basically, as long as you meet up with the official  Project <a href="https://doc.opensuse.org/release-notes/x86_64/openSUSE/Leap/15.3/">recommendations,</a> you should be fine.</p><p id="462bac54-3bff-488a-b9da-8064a2dd61a9" class="">
+</p><p id="21cfd18b-a93c-4c34-b7ff-4f18a9a5c148" class="">A hardware example would look like this:</p><p id="dc0d5eb4-777d-49fa-8fe1-e91e883a8967" class="">CPU with Virtualization. Example:  <a href="https://www.amazon.de/Intel-Celeron-LGA1200-BX80701G5905-Prozessor/dp/B08LBV3HY4/ref=sr_1_1?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;dchild=1&amp;keywords=intel+celeron&amp;qid=1628599767&amp;sr=8-1">Intel Celeron N3450</a></p><p id="f6ea5bd3-1a5d-451e-bab0-7e03f6f42615" class="">RAM: 4 GB RAM (More is better)</p><p id="d04878d5-fe9f-4c28-be49-bcfc73c6dcb7" class="">NVM/SSD drive   128 GB should be enough for the start (More is better)</p><p id="9ba6747d-1bef-448c-b0e0-da2636918e06" class="">1 TB external HDD for your Nextcloud data</p><p id="5136b32d-bf7d-4d3f-bdf1-9ea35006256f" class="">
+</p><h1 id="5620baa2-13d4-4b4b-a764-de1da0b0ddc6" class="">Before we start:</h1><p id="6720372d-0503-4612-9aef-fb8814cac113" class="">You can follow this guide on an already running system or make a fresh installation.</p><p id="4cad7850-e165-430b-8c47-5ae670dd3b76" class="">If you decide for a clean new server,  just follow the official documentation</p><figure id="48ab93e9-80fb-495f-9093-ead81cc249be"><a href="https://doc.opensuse.org/documentation/leap/startup/html/book-startup/art-opensuse-installquick.html" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Installation Quick Start | Start-Up | openSUSE Leap 15.3</div><div class="bookmark-description">Use these instructions if there is no existing Linux system on your machine, or if you want to replace an existing Linux system. Insert a DVD or a bootable USB stick containing the installation image for openSUSE Leap , then reboot the computer to start the installation program.</div></div><div class="bookmark-href">https://doc.opensuse.org/documentation/leap/startup/html/book-startup/art-opensuse-installquick.html</div></div><img src="https://doc.opensuse.org/documentation/leap/startup/html/book-startup/images/install_welcome_osuse.png" class="bookmark-image"/></a></figure><h2 id="66cb1797-032f-473d-af48-240216a06f7f" class="">Attention:</h2><p id="8afe2567-d9d0-46cd-a21b-b4b5e66c9a29" class="">openSUSE  is using firewalld and all ports are blocked by default.
+This means that your machine is not able to send data via ports per default.</p><p id="8f0d2636-f82c-4ea9-9d78-113f4c9358de" class="">Here are more <a href="https://doc.opensuse.org/documentation/leap/security/html/book-security/cha-security-firewall.html#sec-security-firewall-firewalld">optional information about this topic.</a> </p><p id="43ea5e64-0373-4c7c-8329-dbfa4ae22bfa" class="">
+</p><p id="9fa3443c-d1dc-40b0-a36e-dbbd45f5968b" class="">There are two option to avoid problems.</p><h3 id="8240a4ad-1129-4341-834b-bfeb2745beca" class="">Option 1: </h3><ol type="1" id="0866fef3-7c1e-434c-a385-f066f49791d5" class="numbered-list" start="1"><li>If you make a fresh installation of openSUSE leap 15.3, you can just turn off the firewall on the last step of the installation process.<figure id="0d4db515-f99f-4a25-8136-a548bb75bb48" class="image"><a href="How%20to%20have%20control%20over%20your%20personal%20data%20in%203%20s%206c5cdcc1c5204d119f3fc4dc65915a01/Untitled.png"><img style="width:528px" src="How%20to%20have%20control%20over%20your%20personal%20data%20in%203%20s%206c5cdcc1c5204d119f3fc4dc65915a01/Untitled.png"/></a></figure><p id="14fa1581-e6c6-4521-9946-e8f180f1f741" class="">In this way, you ensure, that your fresh system firewall is disabled, and you can access it from another computer via ssh.</p></li></ol><h3 id="27a8bf88-f5d9-485c-a8a7-cec38a293841" class="">Option 2:</h3><ol type="1" id="350105b5-0be7-4dfe-8d0d-19c070538e48" class="numbered-list" start="1"><li>Stop the firewall on your running system<pre id="4e3a3340-cede-47f8-9455-a544d2436cd3" class="code"><code>sudo systemctl stop firewalld.service</code></pre></li></ol><ol type="1" id="b4dd8e90-7919-42f5-a9d1-f222394e60c0" class="numbered-list" start="2"><li>Disable the firewall, so on the next reboot it doesn&#x27;t start the firewall again<pre id="7abbc571-7060-4335-b18b-f374dba0e167" class="code"><code>sudo systemctl disable firewalld.service</code></pre></li></ol><p id="18a24abc-2b18-4a4e-a66f-0bd088adad8d" class="">
+</p><ol type="1" id="c0f45837-6d46-430e-8dc1-75d466a2c8eb" class="numbered-list" start="3"><li>Check if the firewall service has stopped <pre id="e69c1577-e9e3-4be3-b6b5-ac08483a2e3a" class="code"><code>systemctl is-active firewalld </code></pre><p id="85e9d83f-08f0-4f7f-bb2c-9e7c9b8cfa67" class="">Expected Output: inactive</p></li></ol><ol type="1" id="de7a5ebf-1637-40f7-b65f-bc30c134a100" class="numbered-list" start="4"><li>Check if the firewall is disabled<pre id="616914f0-835e-46ce-8cd1-2129018d73eb" class="code"><code>systemctl is-enabled firewalld</code></pre><p id="99dc9978-07e0-4064-8e93-d8a6c4d42118" class="">Expected Output: disabled</p></li></ol><p id="c645f746-f63c-4e5e-a332-b983f527e3c9" class="">
+</p><p id="4739b225-af83-4129-91c8-3112de1d2fe4" class="">Now you are good to go and can start with the  How-to guide.</p><p id="96db1fa4-b34e-45de-84e4-ecf7326a5254" class="">
+</p><h2 id="db124feb-d7e5-4a59-90fb-020c4265ca82" class="">Open ports on your router.</h2><p id="fd1f8307-4d5c-4e8c-9d8c-eec7dd1f6a37" class="">To be able to communicate with your server from outside your network, you need to have admin  access to your router.</p><p id="3fa241df-4112-4b2e-a400-c55c8f5b9d41" class="">Every Router has different Interfaces. So  you need to check the  manufacturer manual how to open ports for your server.</p><p id="af90935d-8e26-404e-b4b7-9273bd14aa94" class="">
+</p><p id="8aab6434-868a-473b-967f-058014c886f0" class="">You can check if your ports are open here:</p><figure id="b9a40f3f-27b2-4590-942f-3e3a16230ca1"><a href="https://www.yougetsignal.com/tools/open-ports/" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Open Port Check Tool - Test Port Forwarding on Your Router</div><div class="bookmark-description">The port forwarding tester is a utility used to identify your external IP address and detect open ports on your connection. This tool is useful for finding out if your port forwarding is setup correctly or if your server applications are being blocked by a firewall.</div></div><div class="bookmark-href"><img src="https://www.yougetsignal.com/favicon.ico" class="icon bookmark-icon"/>https://www.yougetsignal.com/tools/open-ports/</div></div></a></figure><p id="c3fdc1c5-d129-41a9-b09c-e650619e88ba" class="">
+</p><p id="242c77ef-83f4-4b1b-b621-86ab74c2b677" class="">
+</p><h2 id="069fb81c-ec6d-47d6-8614-b4ead385a8f7" class="">How to in 3 STEPS</h2><h3 id="070315aa-6b23-4af9-b743-9538b48d5646" class="">STEP 1
+Install docker on openSUSE LINUX.</h3><ol type="1" id="b8dffff7-212b-4159-bc11-c4f9c33f25b3" class="numbered-list" start="1"><li>Open up a command line with CTRL + ALT + T</li></ol><ol type="1" id="ca0c9e8f-4115-47ad-9516-7cadb4db1203" class="numbered-list" start="2"><li>Update your system and install updates.<pre id="bba06f07-61bf-42b5-b071-0c2fe1f36063" class="code"><code>sudo zypper refresh &amp;&amp; sudo zypper update</code></pre><p id="94cef904-ee00-4401-9b7e-ce1c4ca15433" class="">If your system is up-to-date the output should look like this</p><pre id="d56a2d64-c882-4412-9057-066de1772692" class="code"><code>All repositories have been refreshed.
+Nothing to do.</code></pre><p id="c2a5d7d6-c902-47b0-a674-5ca8ae901fc3" class="">Else install all updates by entering &quot;y&quot; in the console.</p></li></ol><ol type="1" id="891de932-4972-444f-96bd-8aea0c1094a6" class="numbered-list" start="3"><li> Install docker and docker compose.<pre id="99b429c9-042f-4783-920c-81b551733c4a" class="code"><code>sudo zypper install docker python3-docker-compose</code></pre><p id="85702815-154c-46c3-a777-f8767eff47cb" class="">Output should look similar to this </p><pre id="c0dc3487-4102-43af-bf1d-14a4293b2a7c" class="code"><code>Loading repository data...
+Reading installed packages...
+Resolving package dependencies...
+
+The following 3 NEW packages are going to be installed:
+  docker docker-bash-completion python3-docker-compose
+
+3 new packages to install.
+Overall download size: 32.1 MiB. Already cached: 0 B. After the operation, additional 161.7 MiB will be used.
+Continue? [y/n/v/...? shows all options] (y):</code></pre><p id="09ad292f-1882-443b-95cd-d149f2eea4db" class="">Confirm the installation by entering &quot;y&quot; to the console</p><p id="9c22fb0e-5b67-4273-9f09-a605bd1d08f2" class="">Output:</p><pre id="0264ebcb-d9dc-4ffc-b611-04231438fa5f" class="code"><code>Retrieving package docker-20.10.6_ce-lp152.2.12.1.x86_64                                                                                      (1/3),  31.7 MiB (160.3 MiB unpacked)
+Retrieving: docker-20.10.6_ce-lp152.2.12.1.x86_64.rpm ..........................................................................................................[done (24.1 MiB/s)]
+Retrieving package docker-bash-completion-20.10.6_ce-lp152.2.12.1.noarch                                                                      (2/3), 119.5 KiB (113.6 KiB unpacked)
+Retrieving: docker-bash-completion-20.10.6_ce-lp152.2.12.1.noarch.rpm .......................................................................................................[done]
+Retrieving package python3-docker-compose-1.25.1-lp152.1.1.noarch                                                                             (3/3), 242.4 KiB (  1.3 MiB unpacked)
+Retrieving: python3-docker-compose-1.25.1-lp152.1.1.noarch.rpm ..............................................................................................................[done]
+
+Checking for file conflicts: ................................................................................................................................................[done]
+(1/3) Installing: docker-20.10.6_ce-lp152.2.12.1.x86_64 .....................................................................................................................[done]
+Additional rpm output:
+Updating /etc/sysconfig/docker ...
+
+
+(2/3) Installing: docker-bash-completion-20.10.6_ce-lp152.2.12.1.noarch .....................................................................................................[done]
+(3/3) Installing: python3-docker-compose-1.25.1-lp152.1.1.noarch ............................................................................................................[done]</code></pre><p id="67be3925-56f0-4157-9c17-866978e70489" class="">Docker is now installed on your system, to check the version of  docker, do this</p><pre id="93bf7d5e-f8b7-480b-baaa-cbb1aa947079" class="code"><code>docker --version</code></pre><p id="57e3d63b-8090-4cce-8547-d604e0b5fa72" class="">
+</p></li></ol><ol type="1" id="5360fe63-9b16-4e14-aa39-370a0696671c" class="numbered-list" start="4"><li>Per default, docker is not on after installation.
+You need to start the software.<p id="21f0ca17-1229-4beb-9fe5-d42a1513b6a9" class="">Docker also needs to be enabled, so if you reboot your system, the software automatically is executed, and you don&#x27;t need to restart it.</p><p id="64010e39-de47-4b20-86a5-05d2bc30a428" class="">Don&#x27;t worry, it is really easy. 
+Just do these two commands!
+</p><pre id="106a4648-92f3-4fb3-bcfd-5c129d9215fd" class="code"><code>sudo systemctl start docker.service</code></pre><pre id="8f8bb53b-2864-4bdf-a0d3-9709e894c2b6" class="code"><code>sudo systemctl enable docker.service</code></pre></li></ol><ol type="1" id="83294254-26b7-4c00-b89c-8c54feb58a16" class="numbered-list" start="5"><li>To ensure that everything worked out,  let&#x27;s test it with these two commands.<p id="b821d6e5-a917-4b92-a84f-aa2869eefe7e" class=""> </p><pre id="0b700f5f-c0e7-498a-9dd9-a0abba850f65" class="code"><code> systemctl is-active docker
+# active</code></pre><pre id="44a10708-303d-4652-9013-beed0c8d0c56" class="code"><code>systemctl is-enabled docker
+# enabled</code></pre></li></ol><ol type="1" id="3de40297-fa67-4f79-8560-1a985fddd057" class="numbered-list" start="6"><li>Celebrate!!! Docker is now installed on your openSUSE Leap 15.3. You also made sure that on system reboot,  the docker program will automatically start.</li></ol><h2 id="5d67a057-98e9-4cf2-80a8-7c226b9d9561" class="">STEP 2
+Run Nextcloud docker container and make it available on the home network</h2><ol type="1" id="851e1f73-56fb-4890-a24b-2f86ced0d022" class="numbered-list" start="1"><li>Open up a new terminal like in STEP 1 or just use the already opened terminal</li></ol><ol type="1" id="695ec339-805d-4315-8d69-565397a1f154" class="numbered-list" start="2"><li>Now we need to create a working directory for our  upcoming Nextcloud docker container
+Let&#x27;s create a docker directory which includes a Nextcloud directory in your home directory like this.<pre id="b18e40c4-d1f8-4740-b670-3d57de9cef06" class="code"><code>mkdir ~/docker/nextcloud</code></pre></li></ol><ol type="1" id="698eebca-b790-409f-b080-54297c18b29e" class="numbered-list" start="3"><li>Move inside your newly created working directory<pre id="b83cb4b1-df2c-414c-8a51-1c473035cd0b" class="code"><code>cd ~/docker/nextcloud</code></pre></li></ol><ol type="1" id="07eff03a-0c0f-40cf-b724-18fd9fd4dd1f" class="numbered-list" start="4"><li>Now we need to create a configuration file for our docker container, which we can also edit<p id="1e9ad5e0-77bc-4849-b59a-b98fa2740e9a" class="">With vim, we will create a new empty file called docker-compose.yml. 
+This file will contain all our configuration for the docker container.</p><pre id="7303134a-9746-4fae-b939-99a26dfec8f0" class="code"><code>vim docker-compose.yml</code></pre></li></ol><ol type="1" id="3e462360-b6db-47a2-9d45-fb99204f1390" class="numbered-list" start="5"><li>Fill content of docker-compose<pre id="2960e1fa-9fee-43e8-80c8-12307352f893" class="code"><code>version: &quot;3&quot;
+
+volumes:
+  nextcloud:
+    driver: local
+  db:
+
+networks:
+  nc-nginx:
+
+services:
+  db:
+    image: mariadb:10.5
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=&lt;INSERT-YOUR-PASSWORD&gt;
+      - MYSQL_PASSWORD=&lt;INSERT-YOUR-PASSWORD&gt;
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    networks:
+      nc-nginx:
+
+  app:
+    image: nextcloud
+    restart: always
+    ports:
+      - 8080:80
+    links:
+      - db
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=&lt;INSERT-YOUR-PASSWORD&gt;
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_HOST=db
+    networks:
+      nc-nginx:</code></pre></li></ol><p id="70863a21-eb91-4e73-a7b3-521d8b87ff39" class="">
+</p><p id="32f59ab0-0284-42d2-85c4-e8d216c53d6a" class="">
+</p><h3 id="29ea6d1d-a903-4c60-bfd9-ebd4304326f4" class="">STEP 3</h3><p id="868439ae-f8d1-482f-8cab-543c38272aff" class="">
+</p><h3 id="2d1edbd8-562f-4b19-956d-12e4f3a7587b" class="">Quick Guide for  advanced user (STEP 1-3) </h3><figure id="95f9b309-907c-4357-b21c-eaab948f6165" class="link-to-page"><a href="How%20to%20have%20control%20over%20your%20personal%20data%20in%203%20s%206c5cdcc1c5204d119f3fc4dc65915a01/Quick%20Guide%20for%20advanced%20user%2095f9b309907c4357b21ceaab948f6165.html"><span class="icon">🖥️</span>Quick Guide for advanced user:</a></figure><h3 id="41dda09b-953b-4a0a-9d72-ab01925834ce" class="">Summary</h3><p id="1ec1a24c-9325-4732-b7c3-ce651e29e44b" class="">If everything worked out, you should own now your personal  own cloud server.
+You can access it via a subdomain delivered by Duck DNS. A  bash script will update your IP every 5 minutes and  ensure your server is reachable even if  you don&#x27;t have a static IP. </p><p id="f849dab2-0f45-4c2e-a98c-334fb2b98a29" class="">The Nginx Proxy Manager will redirect your, encrypted data to your Nextcloud docker container.</p><p id="0fab42d3-8983-478e-812c-665249154af9" class="">Nextcloud is your personal cloud, and you are again in the control of your data.</p><p id="3e3ec8a7-5aaf-4d28-82fa-7cb4c294fde5" class="">Congratulation, you did it!</p><p id="45b63c4c-ab31-40a0-a366-33773d10f179" class="">
+</p><h3 id="dfb544b1-c373-4d54-ae80-06918e36545e" class="">Sources</h3><p id="b4d3afbe-d066-4800-8776-0d3ae017ec93" class="">Nextcloud</p><figure id="0dcbfbf5-fa38-4054-919a-ea0dbe5f1768"><a href="https://docs.nextcloud.com/" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Nextcloud Documentation</div><div class="bookmark-description">Nextcloud is an open source, self-hosted file share and communication platform. Access &amp; sync your files, contacts, calendars &amp; communicate and collaborate across your devices. You decide what happens with your data, where it is and who can access it!</div></div><div class="bookmark-href">https://docs.nextcloud.com/</div></div></a></figure><figure id="045d4fae-da47-4086-8f66-42f37825e384"><a href="https://hub.docker.com/_/nextcloud" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Nextcloud - Official Image | Docker Hub</div><div class="bookmark-description">A safe home for all your data</div></div><div class="bookmark-href"><img src="https://hub.docker.com/favicon.ico" class="icon bookmark-icon"/>https://hub.docker.com/_/nextcloud</div></div></a></figure><p id="22d1ea19-8b2f-4906-a56c-e461d216f3ba" class="">
+</p><p id="299785b3-e168-46b7-8b63-208c6da362a1" class="">NGINX</p><p id="061060b3-d4c4-4b36-8d8a-8327dd4c7323" class=""><a href="https://nginxproxymanager.com/guide/#hosting-your-home-network">https://nginxproxymanager.com/guide/#hosting-your-home-network</a></p><p id="f2991834-570d-433a-a8bc-733abd78dba7" class="">
+</p><p id="badc5c7b-f81a-4f23-939c-c8d1c75d0117" class="">Duck DNS</p><figure id="5deed155-ede2-4532-af58-1ea45cbf1789"><a href="https://www.duckdns.org/why.jsp" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Duck DNS</div><div class="bookmark-description">why do I need DuckDNS or any DDNS service? most connections to the internet are through a dynamic external IP address which changes quite often (weekly or even daily). this can make it very difficult to connect to home services from an external computer.</div></div><div class="bookmark-href"><img src="http://www.duckdns.org/img/favicon.ico" class="icon bookmark-icon"/>https://www.duckdns.org/why.jsp</div></div></a></figure><p id="44052f6b-9ffe-4ff2-9c4a-d2cf5fd17de3" class="">
+</p><p id="3060a130-c068-4e5c-8c8c-46c7235bf120" class="">Docker</p><figure id="0223d071-a83c-44c8-8528-62f5090577aa"><a href="https://en.opensuse.org/Docker" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Docker</div><div class="bookmark-description">Tested on openSUSE Recommended articles Related articles Warning: Currently there is a bug in docker that disables quotas globally in btrfs partitions. To preserve quota accounting for the root filesystem, as a workaround you can create a different partition (even btrfs) and mount on /var/lib/docker.</div></div><div class="bookmark-href"><img src="https://static.opensuse.org/favicon.ico" class="icon bookmark-icon"/>https://en.opensuse.org/Docker</div></div></a></figure><figure id="2ce46b43-853e-47d4-a067-cd124f5f399a"><a href="https://docs.docker.com/get-started/" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Orientation and setup</div><div class="bookmark-description">Welcome! We are excited that you want to learn Docker. This page contains step-by-step instructions on how to get started with Docker.</div></div><div class="bookmark-href"><img src="https://docs.docker.com/favicons/docs@2x.ico" class="icon bookmark-icon"/>https://docs.docker.com/get-started/</div></div><img src="https://docs.docker.com/favicons/docs@2x.ico" class="bookmark-image"/></a></figure><p id="fd9ec177-096d-45fb-a476-2f21f9d191df" class="">
+</p><p id="d102a80b-b95d-4669-a3aa-71bdcc423b5c" class="">Router Ports</p><figure id="8e86038c-64e7-4f43-a144-1015f6cc4b57"><a href="https://www.yougetsignal.com/tools/open-ports/" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Open Port Check Tool - Test Port Forwarding on Your Router</div><div class="bookmark-description">The port forwarding tester is a utility used to identify your external IP address and detect open ports on your connection. This tool is useful for finding out if your port forwarding is setup correctly or if your server applications are being blocked by a firewall.</div></div><div class="bookmark-href"><img src="https://www.yougetsignal.com/favicon.ico" class="icon bookmark-icon"/>https://www.yougetsignal.com/tools/open-ports/</div></div></a></figure><p id="dd8d4fb1-9e27-47ac-a8a3-eb47a39caebc" class="">
+</p></div></article></body></html>
